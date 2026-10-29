@@ -1,0 +1,337 @@
+name: Pipeline Proyecto ARTECO
+
+run-name: ${{ github.actor }} esta ejecutando el pipeline de ARTECO
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+jobs:
+
+  # 1. INFORMACION GENERAL DEL PIPELINE
+  informacion-proyecto:
+    name: 1 - Informacion del proyecto
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Mostrar informacion de ejecucion
+        run: |
+          echo "======================================"
+          echo "       PIPELINE PROYECTO ARTECO"
+          echo "======================================"
+          echo "Usuario: ${{ github.actor }}"
+          echo "Evento: ${{ github.event_name }}"
+          echo "Repositorio: ${{ github.repository }}"
+          echo "Rama: ${{ github.ref }}"
+
+      - name: Descargar repositorio
+        uses: actions/checkout@v6
+
+      - name: Mostrar archivos del repositorio
+        run: |
+          echo "Estructura actual del repositorio:"
+          find . -maxdepth 3 -type f
+
+
+  # 2. PROCESO DEL NEGOCIO
+  proceso-control-vehicular:
+    name: 2 - Proceso de control vehicular
+    runs-on: ubuntu-latest
+    needs: informacion-proyecto
+
+    steps:
+
+      - name: Explicar proceso de ingreso y salida
+        run: |
+          echo "======================================"
+          echo " PROCESO DE CONTROL VEHICULAR ARTECO"
+          echo "======================================"
+
+          echo "1. El vehiculo llega al punto de control."
+
+          echo "2. La camara LPR captura la placa."
+
+          echo "3. La imagen es enviada al sistema."
+
+          echo "4. Se procesa la placa identificada."
+
+          echo "5. El sistema consulta si el vehiculo"
+          echo "   y el conductor estan autorizados."
+
+          echo "6. Si corresponde, se realiza"
+          echo "   comparacion facial."
+
+          echo "7. Se obtiene el resultado de"
+          echo "   la validacion."
+
+          echo "8. El resultado se registra."
+
+          echo "9. Si existe una irregularidad,"
+          echo "   se genera una alerta."
+
+          echo "10. El personal de seguridad toma"
+          echo "    la decision final."
+
+          echo "IMPORTANTE:"
+          echo "El sistema NO abre automaticamente"
+          echo "el porton."
+
+
+  # 3. FLUJO TECNICO AWS
+  arquitectura-aws:
+    name: 3 - Flujo de arquitectura AWS
+    runs-on: ubuntu-latest
+    needs: proceso-control-vehicular
+
+    steps:
+
+      - name: Mostrar flujo AWS
+        run: |
+          echo "======================================"
+          echo "       ARQUITECTURA AWS"
+          echo "======================================"
+
+          echo "Camara LPR / Camara facial"
+          echo "        |"
+          echo "        v"
+          echo "Amazon S3"
+          echo "        |"
+          echo "        | Trigger ObjectCreated"
+          echo "        v"
+          echo "Lambda - Procesar placa"
+          echo "        |"
+          echo "        v"
+          echo "Amazon EventBridge"
+          echo "        |"
+          echo "        +----------------------+"
+          echo "        |                      |"
+          echo "        v                      v"
+          echo "Lambda Consultar       Lambda Registrar"
+          echo "Autorizacion           Evento"
+          echo "        |                      |"
+          echo "        v                      v"
+          echo "RDS Proxy ------------> Aurora"
+          echo ""
+          echo "Si existe una irregularidad:"
+          echo ""
+          echo "EventBridge"
+          echo "    |"
+          echo "    v"
+          echo "Lambda Gestionar Alerta"
+          echo "    |"
+          echo "    v"
+          echo "Amazon SNS"
+
+
+  # 4. TRIGGERS Y BUS DE EVENTOS
+  eventos:
+    name: 4 - Triggers y eventos
+    runs-on: ubuntu-latest
+    needs: arquitectura-aws
+
+    steps:
+
+      - name: Mostrar triggers
+        run: |
+          echo "======================================"
+          echo "       TRIGGERS DEL SISTEMA"
+          echo "======================================"
+
+          echo "Trigger 1:"
+          echo "Nueva imagen en S3"
+          echo "-> ObjectCreated"
+          echo "-> Lambda Procesar Placa"
+
+          echo ""
+
+          echo "Evento 1:"
+          echo "PlacaProcesada"
+          echo "-> EventBridge"
+          echo "-> Consultar autorizacion"
+
+          echo ""
+
+          echo "Evento 2:"
+          echo "ValidacionFinalizada"
+          echo "-> EventBridge"
+          echo "-> Registrar evento"
+
+          echo ""
+
+          echo "Evento 3:"
+          echo "ValidacionRechazada"
+          echo "-> EventBridge"
+          echo "-> Gestionar alerta"
+          echo "-> SNS"
+
+
+  # 5. REQUERIMIENTOS NO FUNCIONALES
+  validar-rnf:
+    name: 5 - RNF y metricas
+    runs-on: ubuntu-latest
+    needs: eventos
+
+    steps:
+
+      - name: Mostrar atributos priorizados
+        run: |
+          echo "======================================"
+          echo "     ATRIBUTOS PRIORIZADOS"
+          echo "======================================"
+
+          echo "1. Rendimiento"
+          echo "2. Disponibilidad"
+
+      - name: Mostrar metricas
+        run: |
+          echo "======================================"
+          echo "        METRICAS DEL SISTEMA"
+          echo "======================================"
+
+          echo "Consulta de autorizacion:"
+          echo "P95 <= 2 segundos"
+
+          echo ""
+
+          echo "Procesamiento de placa:"
+          echo "P95 <= 3 segundos"
+
+          echo ""
+
+          echo "Comparacion facial:"
+          echo "P95 <= 3 segundos"
+
+          echo ""
+
+          echo "Carga de referencia:"
+          echo "6.53 eventos por minuto"
+
+          echo ""
+
+          echo "Pruebas de crecimiento:"
+          echo "1x = 6.53 eventos/min"
+          echo "2x = 13.06 eventos/min"
+          echo "3x = 19.59 eventos/min"
+
+      - name: Mostrar comportamiento medible
+        run: |
+          echo "======================================"
+          echo "     REGISTRO DE TIEMPOS"
+          echo "======================================"
+
+          echo "t0 = inicio de solicitud"
+          echo "t1 = placa procesada"
+          echo "t2 = autorizacion consultada"
+          echo "t3 = comparacion facial finalizada"
+          echo "t4 = resultado registrado"
+
+          echo ""
+
+          echo "Tiempo total = t4 - t0"
+
+          echo ""
+
+          echo "CloudWatch utilizara estos datos para:"
+          echo "- medir latencia"
+          echo "- calcular P95"
+          echo "- medir eventos por minuto"
+          echo "- registrar errores"
+          echo "- generar alarmas"
+
+
+  # 6. VALIDAR ESTRUCTURA DEL REPOSITORIO
+  validar-repositorio:
+    name: 6 - Validar repositorio
+    runs-on: ubuntu-latest
+    needs: validar-rnf
+
+    steps:
+
+      - name: Descargar repositorio
+        uses: actions/checkout@v6
+
+      - name: Verificar README
+        run: |
+          if [ -f "README.md" ]; then
+            echo "README.md encontrado"
+          else
+            echo "ERROR: README.md no encontrado"
+            exit 1
+          fi
+
+      - name: Verificar workflow
+        run: |
+          if [ -d ".github/workflows" ]; then
+            echo "Directorio de workflows encontrado"
+          else
+            echo "ERROR: No existe .github/workflows"
+            exit 1
+          fi
+
+  # 7. VALIDACION FUTURA DE INFRAESTRUCTURA
+  validar-infraestructura:
+    name: 7 - Validar infraestructura como codigo
+    runs-on: ubuntu-latest
+    needs: validar-repositorio
+
+    steps:
+
+      - name: Descargar repositorio
+        uses: actions/checkout@v6
+
+      - name: Buscar CloudFormation
+        run: |
+          if [ -d "cloudformation" ]; then
+
+            echo "Directorio CloudFormation encontrado."
+
+            echo "En una siguiente etapa se validaran"
+            echo "las plantillas de infraestructura."
+
+            find cloudformation -type f
+
+          else
+
+            echo "CloudFormation aun no se encuentra"
+            echo "implementado en el repositorio."
+
+            echo "Esta etapa queda preparada para"
+            echo "la siguiente evolucion del proyecto."
+
+          fi
+
+  # 8. FINAL
+  resultado:
+    name: 8 - Resultado final
+    runs-on: ubuntu-latest
+
+    needs:
+      - informacion-proyecto
+      - proceso-control-vehicular
+      - arquitectura-aws
+      - eventos
+      - validar-rnf
+      - validar-repositorio
+      - validar-infraestructura
+
+    steps:
+
+      - name: Pipeline completado
+        run: |
+          echo "Proceso vehicular: OK"
+          echo "Arquitectura AWS: OK"
+          echo "Triggers y eventos: OK"
+          echo "RNF y metricas: OK"
+          echo "Repositorio: OK"
+
+          echo ""
+
+          echo "El siguiente paso sera incorporar"
+          echo "CloudFormation y las funciones Lambda"
+          echo "para realizar validaciones y despliegues reales."
