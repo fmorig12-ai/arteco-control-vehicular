@@ -1,4 +1,3 @@
-
 terraform {
   required_version = ">= 1.10.0"
 
@@ -10,8 +9,8 @@ terraform {
   }
 
   backend "s3" {
-    key         = "terraform/arteco-demo-s3.tfstate"
-    encrypt     = true
+    key          = "terraform/arteco-demo-s3.tfstate"
+    encrypt      = true
     use_lockfile = true
   }
 }
@@ -30,7 +29,7 @@ resource "aws_s3_bucket" "demo" {
   force_destroy = true
 
   tags = {
-    Name    = "arteco-control-demo"
+    Name     = "arteco-control-demo"
     Proyecto = "ARTECO"
     Entorno  = "laboratorio"
     Gestion  = "Terraform"
