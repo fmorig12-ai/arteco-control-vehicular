@@ -1,0 +1,84 @@
+name: GitHub Actions Demo
+
+run-name: ${{ github.actor }} esta ejecutando el pipeline del proyecto ARTECO
+
+on: [push]
+
+jobs:
+  Mostrar-Proyecto-ARTECO:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Mostrar evento que inicio el pipeline
+        run: |
+          echo "El pipeline fue ejecutado por el evento: ${{ github.event_name }}"
+
+      - name: Mostrar repositorio y rama
+        run: |
+          echo "Repositorio: ${{ github.repository }}"
+          echo "Rama utilizada: ${{ github.ref }}"
+
+      - name: Descargar codigo del repositorio
+        uses: actions/checkout@v6
+
+      - name: Mostrar archivos del proyecto
+        run: |
+          echo "Archivos encontrados en el repositorio:"
+          ls -la ${{ github.workspace }}
+
+      - name: Describir el proyecto
+        run: |
+          echo "PROYECTO ARTECO"
+          echo "Sistema de Control y Verificacion de Acceso Vehicular"
+          echo "El sistema permitira:"
+          echo "- Registrar ingresos y salidas vehiculares."
+          echo "- Validar vehiculos y conductores autorizados."
+          echo "- Consultar residentes, vehiculos y autorizaciones."
+          echo "- Registrar eventos de seguridad."
+          echo "- Generar alertas mediante SMS y WhatsApp."
+          echo "- Almacenar evidencias de los accesos."
+          echo "- Mantener registros pendientes si se pierde Internet."
+
+      - name: Mostrar flujo de la arquitectura
+        run: |
+          echo "1. El vehiculo llega al punto de control."
+          echo "2. Las camaras capturan placa y conductor."
+          echo "3. El Gateway local envia la informacion mediante HTTPS."
+          echo "4. API Gateway recibe la solicitud."
+          echo "5. AWS Lambda procesa la validacion."
+          echo "6. Aurora consulta residentes, vehiculos y autorizaciones."
+          echo "7. Rekognition puede apoyar la comparacion facial."
+          echo "8. EventBridge publica los eventos generados."
+          echo "9. SNS envia alertas y notificaciones."
+          echo "10. CloudWatch registra logs y metricas."
+
+      - name: Mostrar servicios AWS utilizados
+        run: |
+          echo "- Amazon CloudFront"
+          echo "- AWS WAF"
+          echo "- Amazon Cognito"
+          echo "- Amazon API Gateway"
+          echo "- AWS Lambda"
+          echo "- Amazon EventBridge"
+          echo "- Amazon SNS"
+          echo "- Amazon CloudWatch"
+          echo "- Amazon S3"
+          echo "- AWS KMS"
+          echo "- Amazon RDS Proxy"
+          echo "- Amazon Aurora Serverless v2"
+          echo "- Amazon Rekognition"
+          echo "- AWS Backup"
+          echo "- AWS CloudFormation"
+
+      - name: Mostrar metricas que controlara el sistema
+        run: |
+          echo "- Tiempo de validacion."
+          echo "- Cantidad de accesos por hora."
+          echo "- Cantidad de alertas."
+          echo "- Errores y reintentos."
+          echo "- Registros pendientes de sincronizacion."
+
+      - name: Finalizar pipeline
+        run: |
+          echo "Pipeline ejecutado correctamente."
+          echo "Estado del job: ${{ job.status }}"
