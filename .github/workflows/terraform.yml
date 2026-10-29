@@ -1,0 +1,84 @@
+
+name: ARTECO Terraform Apply Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "Operacion de Terraform"
+        required: true
+        type: choice
+        options:
+          - apply
+          - destroy
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  terraform:
+    name: Terraform ${{ inputs.operation }}
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+      TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
+      TF_IN_AUTOMATION: "true"
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar acceso a AWS mediante OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Verificar identidad AWS
+        run: aws sts get-caller-identity
+
+      - name: Instalar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.10.5"
+
+      - name: Inicializar Terraform
+        working-directory: terraform
+        run: |
+          terraform init -input=false \
+            -backend-config="bucket=${TF_STATE_BUCKET}" \
+            -backend-config="region=${AWS_REGION}" \
+            -backend-config="key=terraform/arteco-demo-s3.tfstate" \
+            -backend-config="encrypt=true" \
+            -backend-config="use_lockfile=true"
+
+      - name: Validar configuracion
+        working-directory: terraform
+        run: |
+          terraform fmt -check
+          terraform validate
+
+      - name: Planificar y desplegar recursos
+        if: ${{ inputs.operation == 'apply' }}
+        working-directory: terraform
+        run: |
+          terraform plan -input=false -out=tfplan
+          terraform apply -input=false -auto-approve tfplan
+
+      - name: Destruir recursos del proyecto
+        if: ${{ inputs.operation == 'destroy' }}
+        working-directory: terraform
+        run: |
+          terraform plan -destroy -input=false
+          terraform destroy -input=false -auto-approve
+
+      - name: Mostrar resultado
+        if: success()
+        run: |
+          echo "Operacion: ${{ inputs.operation }}"
+          echo "Region: ${AWS_REGION}"
+          echo "Bucket de estado preservado: ${TF_STATE_BUCKET}"
+          echo "Ejecucion completada correctamente."
